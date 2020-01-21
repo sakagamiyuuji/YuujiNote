@@ -21,7 +21,7 @@ import java.util.ArrayList;
 ;
 
 public class MainActivity extends AppCompatActivity{
-    private FloatingActionButton fab;
+    private FloatingActionButton fab, save;
     private ListView lvItems;
     private ArrayList<String> items;
     private ArrayAdapter<String> itemsAdapter;
@@ -53,7 +53,12 @@ public class MainActivity extends AppCompatActivity{
             items.add("Item ke - " + i);
         }*/
 
-        saveData();
+        save.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveData();
+            }
+        });
 
     }
 
@@ -80,12 +85,14 @@ public class MainActivity extends AppCompatActivity{
 
     public void initialComponent() {
         fab = findViewById(R.id.fab_btn);
+        save = findViewById(R.id.save_btn);
         lvItems = findViewById(R.id.lv_toDo);
 
     }
 
     public void saveData(){
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         Gson gson = new Gson();
         String json = gson.toJson(items);
@@ -95,6 +102,7 @@ public class MainActivity extends AppCompatActivity{
 
     public void loadData(){
         SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        //SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Gson gson = new Gson();
         String json = sharedPreferences.getString("task list", null);
         Type type = new TypeToken<ArrayList<String>>() {}.getType();
