@@ -1,9 +1,6 @@
 package com.e.yuujinote;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -12,9 +9,16 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+;
 
 public class MainActivity extends AppCompatActivity{
     private FloatingActionButton fab;
@@ -32,6 +36,7 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         initialComponent();
 
+        loadData();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -48,9 +53,9 @@ public class MainActivity extends AppCompatActivity{
             items.add("Item ke - " + i);
         }*/
 
+        saveData();
+
     }
-
-
 
 
     public void addtask () {
@@ -79,6 +84,27 @@ public class MainActivity extends AppCompatActivity{
 
     }
 
+    public void saveData(){
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        Gson gson = new Gson();
+        String json = gson.toJson(items);
+        editor.putString("task list", json);
+        editor.apply();
+    }
+
+    public void loadData(){
+        SharedPreferences sharedPreferences = getSharedPreferences("shared preferences", MODE_PRIVATE);
+        Gson gson = new Gson();
+        String json = sharedPreferences.getString("task list", null);
+        Type type = new TypeToken<ArrayList<String>>() {}.getType();
+        items =  gson.fromJson(json, type);
+
+        if (items == null){
+            items = new ArrayList<>();
+        }
+    }
+
 /*    @Override
     protected void onPause() {
         super.onPause();
@@ -103,8 +129,11 @@ public class MainActivity extends AppCompatActivity{
             String key = String.valueOf(a);
             String cookies = sp.getString(key, null);
             items.add(cookies);
-        }
 
+            if (items == null){
+                items = new ArrayList<>();
+            }
+        }
     }*/
 }
 
