@@ -3,9 +3,10 @@ package com.e.yuujinote;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -23,16 +24,19 @@ public class MainActivity extends AppCompatActivity{
     private EditText edtTitle, edtActivity;
     private String title, activity;
 
+    private final String NOTE_SP = "NOTE_SP";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initialComponent();
 
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                addtask2();
+                addtask();
             }
         });
 
@@ -43,62 +47,16 @@ public class MainActivity extends AppCompatActivity{
         /*for (int i = 0; i < 25; i++) {
             items.add("Item ke - " + i);
         }*/
-    }
-
-
-
-    public void formKosong(){
-        edtTitle.setText(null);
-        edtActivity.setText(null);
-    }
-
-    public void getForm(){
-        title = edtTitle.getText().toString();
-        activity = edtActivity.getText().toString();
-    }
-
-    public void addTask () {
-        AlertDialog.Builder alert = new AlertDialog.Builder(this);
-        alert.setTitle("New Task");
-        alert.setMessage("Create new task?");
-
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.form_alert, null);
-        alert.setView(dialogView);
-        alert.setCancelable(true);
-        alert.setIcon(R.mipmap.ic_launcher);
-
-        edtTitle = findViewById(R.id.edt_title);
-        edtActivity = findViewById(R.id.edt_activity);
-        formKosong();
-
-        alert.setPositiveButton("SUBMIT", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                title = edtTitle.getText().toString();
-                items.add(title);
-
-            }
-        });
-
-        alert.setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-            }
-        });
-
-        alert.create().show();
-
-        //alert.setView(inputField);
-
 
     }
 
-    public void addtask2 () {
+
+
+
+    public void addtask () {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Add a task");
-        builder.setMessage("What do you want to do?");
+        builder.setTitle("NEW TASK");
+        builder.setMessage("Create a new task?");
         final EditText inputField = new EditText(this);
         builder.setView(inputField);
         builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
@@ -120,5 +78,33 @@ public class MainActivity extends AppCompatActivity{
         lvItems = findViewById(R.id.lv_toDo);
 
     }
+
+/*    @Override
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences sp = getSharedPreferences(NOTE_SP, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+
+        for (int i=0; i<= items.size(); i++){
+            String key = String.valueOf(i);
+            String item = items.get(i);
+            editor.putString(key,item);
+        }
+
+        editor.apply();
+    }
+
+    protected void showSP(){
+        SharedPreferences sp = getSharedPreferences(NOTE_SP, Context.MODE_PRIVATE);
+        int createCookies = 0;
+
+        for (int a = 0; a<= items.size(); a++){
+            String key = String.valueOf(a);
+            String cookies = sp.getString(key, null);
+            items.add(cookies);
+        }
+
+    }*/
 }
 
