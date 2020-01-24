@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity{
     private ListView lvItems;
     private ArrayList<String> items;
     private ArrayAdapter<String> itemsAdapter;
-    private final String NOTE_SP = "NOTE_SP";
+    private EditText edtClick;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,27 +44,15 @@ public class MainActivity extends AppCompatActivity{
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-                final int which_item = position;
-
-                new AlertDialog.Builder(MainActivity.this)
-                .setIcon(R.drawable.ic_delete_forever_black_24dp)
-                .setTitle("DELETE FOREVER")
-                .setMessage("Are You Sure?")
-                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        items.remove(which_item);
-                        sortSP();
-
-                        itemsAdapter.notifyDataSetChanged();
-
-                    }
-                })
-
-                .setNegativeButton("NO", null)
-                .show();
-
+                sortSP(position);
                 return true;
+            }
+        });
+
+        lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                editLV(position);
             }
         });
 
@@ -79,6 +67,38 @@ public class MainActivity extends AppCompatActivity{
         }*/
     }
 
+    public void editLV(final int position){
+        final int which_item = position;
+        View view = View.inflate(this, R.layout.edit, null);
+        edtClick = view.findViewById(R.id.edt_click);
+        edtClick.setText(items.get(which_item));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Edit");
+        builder.setView(view);
+        builder.setPositiveButton("Add", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                String textEdt = edtClick.getText().toString();
+
+                //items.remove(which_item);
+                //items.add(which_item,textEdt);
+
+                items.set(which_item,textEdt);
+                sort();
+                itemsAdapter.notifyDataSetChanged();
+
+                Toast.makeText(getApplicationContext(),"DATA TELAH DI TAMBAHKAN", Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
+        builder.setNegativeButton("Cancel", null);
+
+        builder.create().show();
+    }
+
+
     public void addtask () {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("NEW TASK");
@@ -90,13 +110,11 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(DialogInterface dialogInterface, int i) {
                 int new_key = items.size();
                 String item = inputField.getText().toString();
-
                 items.add(new_key,item);
                 addToSh(new_key, item);
 
                 itemsAdapter.notifyDataSetChanged();
 
-                String text = String.valueOf(items.size());
                 Toast.makeText(getApplicationContext(),"DATA TELAH DI TAMBAHKAN", Toast.LENGTH_SHORT).show();
 
             }
@@ -110,11 +128,12 @@ public class MainActivity extends AppCompatActivity{
     private void delSP(int position){
         String key = String.valueOf(position);
         SharedPreferences sh = getSharedPreferences("todo", MODE_PRIVATE);
-        sh.edit().remove(key);
+        items.remove(position);
+
         //hapus 1 item. celah kosong
     }
 
-    private void sortSP(){
+    private void sort(){
         SharedPreferences sp = getSharedPreferences("todo",MODE_PRIVATE);
         SharedPreferences.Editor editor= sp.edit();
         editor.clear();
@@ -123,6 +142,37 @@ public class MainActivity extends AppCompatActivity{
             editor.putString(String.valueOf(i),items.get(i));
         }
         editor.apply();
+    }
+
+    private void sortSP(int position){
+
+        final int which_item = position;
+
+        new AlertDialog.Builder(MainActivity.this)
+                .setIcon(R.drawable.ic_delete_forever_black_24dp)
+                .setTitle("DELETE FOREVER")
+                .setMessage("Are You Sure?")
+                .setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        items.remove(which_item);
+                        SharedPreferences sp = getSharedPreferences("todo",MODE_PRIVATE);
+                        SharedPreferences.Editor editor= sp.edit();
+                        editor.clear();
+                        editor.apply();
+                        for(int i = 0; i < items.size();i++){
+                            editor.putString(String.valueOf(i),items.get(i));
+                        }
+                        editor.apply();
+
+                        itemsAdapter.notifyDataSetChanged();
+
+                    }
+                })
+
+                .setNegativeButton("NO", null)
+                .show();
+
 
     }
 
